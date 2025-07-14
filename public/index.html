@@ -49,6 +49,12 @@
       color: #a0aec0;
       margin-top: 20px;
     }
+
+    #countdown {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #00ffcc;
+    }
   </style>
 </head>
 <body>
@@ -64,10 +70,11 @@
     Your wallet will be charged only once every 30 days.
   </div>
 
+  <div id="countdown">Checking access...</div>
+
   <!-- Solflare Wallet SDK -->
   <script src="https://unpkg.com/@solflare-wallet/sdk@0.4.6/dist/index.iife.js"></script>
 
-  <!-- Wallet Connect Logic -->
   <script>
     // Phantom Connect
     document.getElementById('phantomBtn').addEventListener('click', async () => {
@@ -98,6 +105,34 @@
         alert("Please install Solflare wallet.");
       }
     });
+
+    // Countdown Logic
+    const lastPaymentDate = new Date("2025-07-01T12:00:00Z"); // Replace with backend date
+    const expiryTime = new Date(lastPaymentDate.getTime() + 30 * 24 * 60 * 60 * 1000);
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = expiryTime - now;
+
+      const countdownEl = document.getElementById("countdown");
+
+      if (diff <= 0) {
+        countdownEl.innerText = "⛔ Access expired. Please pay again.";
+        countdownEl.style.color = "red";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      countdownEl.innerText =
+        `✅ Access valid for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown(); // run on load
   </script>
 </body>
 </html>
