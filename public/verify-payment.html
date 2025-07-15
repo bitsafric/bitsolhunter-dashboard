@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Verify Payment - BitSolHunter</title>
+</head>
+<body>
+  <h2>Verify Your Payment</h2>
+
+  <input type="text" id="walletInput" placeholder="Enter Solana wallet address" />
+  <button onclick="verify()">Verify</button>
+
+  <p id="result"></p>
+
+  <script>
+    async function verify() {
+      const wallet = document.getElementById('walletInput').value;
+      const result = document.getElementById('result');
+
+      if (!wallet) {
+        result.textContent = 'Please enter a wallet address.';
+        return;
+      }
+
+      try {
+        const response = await fetch('/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ wallet })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.verified) {
+          result.textContent = '✅ Wallet payment verified!';
+        } else {
+          result.textContent = `❌ Not verified: ${data.message || 'Try again later'}`;
+        }
+      } catch (err) {
+        console.error(err);
+        result.textContent = '❌ Server error. Please try again.';
+      }
+    }
+  </script>
+</body>
+</html>
+
