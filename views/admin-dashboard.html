@@ -1,0 +1,114 @@
+k<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BitSolHunter Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f9;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🛠 BitSolHunter Admin Dashboard</h1>
+
+<table>
+  <thead>
+    <tr>
+      <th>Wallet</th>
+      <th>Status</th>
+      <th>Last Payment</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>7C5kXJz3Y57ZtBRwfn7eayUACKmdD6XYjoYBb1UWWyN5</td>
+      <td>Verified</td>
+      <td>30 USDT on July 13</td>
+      <td><button>Verify Flag</button></td>
+    </tr>
+    <tr>
+      <td>G2H8sKds32aFbzy3kko18VYHc9hFSPPQtvLMVGjPyqxx</td>
+      <td>Pending</td>
+      <td>Waiting...</td>
+      <td><button>Verify Flag</button></td>
+    </tr>
+  </tbody>
+</table>
+
+<h2>🎯 BitSolHunter User Dashboard</h2>
+<p>Wallet: 7C5kXJz3Y57ZtBRwfn7eayUACKmdD6XYjoYBb1UWWyN5</p>
+
+<h2>Referral Dashboard</h2>
+<p>Enter your User ID:</p>
+<input type="text" id="userId" placeholder="Enter User ID">
+<button onclick="getReferralInfo()">Get Referral Info</button>
+
+<p id="referralStatus">Status: ⬜ Pending</p>
+<p id="recentPayments">📜 Recent Payments</p>
+
+<script>
+  async function getReferralInfo() {
+    const userId = document.getElementById('userId').value;
+    const referralStatus = document.getElementById('referralStatus');
+    const recentPayments = document.getElementById('recentPayments');
+
+    if (!userId) {
+      alert("Please enter your User ID.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/referral-dashboard/${userId}`);
+      const data = await response.json();
+
+      if (data.error) {
+        referralStatus.textContent = "Status: ❌ " + data.error;
+        recentPayments.textContent = '';
+      } else {
+        referralStatus.textContent = "Status: ✅ Verified";
+        recentPayments.innerHTML = `
+          📜 Recent Payments:
+          <br>✔ ${data.referredUsersCount} users referred.
+          <br>✔ Payments: ${data.referredUsers.map(user => user.payment).join('<br>')}`;
+      }
+    } catch (err) {
+      console.error('Error fetching referral data:', err);
+      referralStatus.textContent = "Status: ❌ Error fetching data";
+      recentPayments.textContent = '';
+    }
+  }
+</script>
+
+</body>
+</html>
+

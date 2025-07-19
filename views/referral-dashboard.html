@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Referral Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f9;
+    }
+    input {
+      padding: 8px;
+      width: 300px;
+    }
+    button {
+      padding: 8px 16px;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Referral Dashboard</h1>
+
+<p>Enter your User ID to get referral information:</p>
+<input type="text" id="userId" placeholder="Enter User ID">
+<button onclick="getReferralInfo()">Get Referral Info</button>
+
+<p id="referralStatus">Status: ⬜ Pending</p>
+<p id="recentPayments">📜 Recent Payments</p>
+
+<script>
+  async function getReferralInfo() {
+    const userId = document.getElementById('userId').value;
+    const referralStatus = document.getElementById('referralStatus');
+    const recentPayments = document.getElementById('recentPayments');
+
+    if (!userId) {
+      alert("Please enter your User ID.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`/referral-dashboard/${userId}`);
+      const data = await response.json();
+
+      if (data.error) {
+        referralStatus.textContent = "Status: ❌ " + data.error;
+        recentPayments.textContent = '';
+      } else {
+        referralStatus.textContent = "Status: ✅ Verified";
+        recentPayments.innerHTML = `
+          📜 Recent Payments:
+          <br>✔ ${data.referredUsersCount} users referred.
+          <br>✔ Payments: ${data.referredUsers.map(user => user.payment).join('<br>')}`;
+      }
+    } catch (err) {
+      console.error('Error fetching referral data:', err);
+      referralStatus.textContent = "Status: ❌ Error fetching data";
+      recentPayments.textContent = '';
+    }
+  }
+</script>
+
+</body>
+</html>
+
