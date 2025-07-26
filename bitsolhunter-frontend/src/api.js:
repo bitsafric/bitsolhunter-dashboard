@@ -1,0 +1,17 @@
+const API_URL = process.env.REACT_APP_API_URL;
+
+export async function fetchTokens() {
+  const res = await fetch(`${API_URL}/api/tokens`);
+  return await res.json();
+}
+
+export async function fetchTrades() {
+  const res = await fetch(`${API_URL}/api/trades`);
+  return await res.json();
+}
+
+export async function fetchBotStatus() {
+  const res = await fetch(`${API_URL}/api/status`);
+  return await res.json();
+}
+

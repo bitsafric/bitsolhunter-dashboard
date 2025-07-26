@@ -1,0 +1,4 @@
+npx create-react-app bitsolhunter-frontend-temp
+cp -r bitsolhunter-frontend-temp/public ./public
+rm -rf bitsolhunter-frontend-temp
+
