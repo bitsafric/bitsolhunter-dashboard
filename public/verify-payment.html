@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Verify Payment - BitSolHunter</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      background-color: #f8f9fa;
+    }
+    h2 {
+      color: #333;
+    }
+    label, input, button {
+      display: block;
+      margin-top: 15px;
+      font-size: 16px;
+    }
+    input {
+      padding: 10px;
+      width: 100%;
+      max-width: 400px;
+      box-sizing: border-box;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 25px;
+      background-color: #007bff;
+      border: none;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    #result {
+      margin-top: 25px;
+      font-size: 1.2em;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h2>Verify Your Crypto Payment</h2>
+
+  <label for="walletInput">Solana Wallet Address:</label>
+  <input type="text" id="walletInput" placeholder="e.g. 3FQxGd...zYtR" />
+  <button onclick="verify()">Verify</button>
+
+  <p id="result"></p>
+
+  <script>
+    async function verify() {
+      const wallet = document.getElementById('walletInput').value.trim();
+      const result = document.getElementById('result');
+
+      if (!wallet) {
+        result.textContent = '❌ Please enter a wallet address.';
+        result.style.color = 'red';
+        return;
+      }
+
+      result.textContent = '⏳ Verifying payment...';
+      result.style.color = '#333';
+
+      try {
+        const response = await fetch('/verify-payment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ wallet })
+        });
+
+        const data = await response.json();
+
+        if (response.ok && data.verified) {
+          result.textContent = '✅ Payment successfully verified!';
+          result.style.color = 'green';
+        } else {
+          result.textContent = `❌ Not verified: ${data.message || data.error || 'Unknown error'}`;
+          result.style.color = 'red';
+        }
+      } catch (err) {
+        console.error(err);
+        result.textContent = '❌ Error contacting server. Please try again.';
+        result.style.color = 'red';
+      }
+    }
+  </script>
+</body>
+</html>
+

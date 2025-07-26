@@ -1,0 +1,23 @@
+<button id="startBtn">▶️ Start Bot</button>
+<button id="stopBtn">⏹ Stop Bot</button>
+<p id="botStatus"></p>
+
+<script>
+  const token = localStorage.getItem("token"); // Assuming login token stored here
+
+  async function controlBot(action) {
+    const endpoint = `/api/bot/${action}`;
+    const res = await fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    const data = await res.json();
+    document.getElementById('botStatus').textContent = `✅ ${data.message}`;
+  }
+
+  document.getElementById('startBtn').onclick = () => controlBot("start");
+  document.getElementById('stopBtn').onclick = () => controlBot("stop");
+</script>
+

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BitSolHunter Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #0d1117;
+      color: #ffffff;
+      text-align: center;
+      padding-top: 80px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      margin-bottom: 30px;
+    }
+
+    .wallet-buttons {
+      display: flex;   
+      justify-content: center;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .wallet-buttons button {
+      padding: 12px 20px;
+      font-size: 1rem;
+      background-color: #6366f1;
+      border: none;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .wallet-buttons button:hover {
+      background-color: #4f46e5;
+    }
+
+    .note {
+      font-size: 0.95rem;
+      color: #a0aec0;
+      margin-top: 20px;
+    }
+
+    #countdown {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      color: #00ffcc;
+    }
+  </style>
+</head>
+<body>
+  <h1>Welcome to BitSolHunter</h1>
+  <p>Access fee required: $30 in SOL, USDC, or USDT</p>
+
+  <div class="wallet-buttons">
+    <button id="phantomBtn">Connect with Phantom</button>
+    <button id="solflareBtn">Connect with Solflare</button>
+  </div>
+
+  <div class="note">
+    Your wallet will be charged only once every 30 days.
+  </div>
+
+  <div id="countdown">Checking access...</div>
+
+  <!-- Solflare Wallet SDK -->
+  <script 
+src="https://unpkg.com/@solflare-wallet/sdk@0.4.6/dist/index.iife.js"></script>
+
+  <script>
+    // Verifies if user has paid the access fee
+    async function verifyPayment(wallet) {
+      try {
+        const res = await fetch('/verify-payment', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ wallet }),
+        });
+        const data = await res.json();
+        if (data.verified) {
+          alert('✅ Payment verified! Welcome to BitSolHunter.');
+          // TODO: redirect to dashboard
+        } else {
+          alert('❌ No valid $30 payment found. Please pay to continue.');
+        }
+      } catch (error) {
+        alert('Server error: ' + error.message);
+      }
+    }
+
+    // Phantom Connect
+    document.getElementById('phantomBtn').addEventListener('click', async () => {
+      const provider = window?.phantom?.solana || window?.solana;
+      if (provider?.isPhantom) {
+        try {
+          const resp = await provider.connect();
+          const wallet = resp.publicKey.toString();
+          alert('Phantom connected: ' + wallet);
+          verifyPayment(wallet);
+        } catch (err) {
+          alert('Phantom connection failed');
+        }
+      } else {
+        alert('Please install Phantom wallet');
+      }
+    });
+
+    // Solflare Connect
+    document.getElementById('solflareBtn').addEventListener('click', async () => {
+      const provider = window.solflare;
+      if (provider && provider.isSolflare) {
+        try {
+          await provider.connect();
+          const wallet = provider.publicKey.toString();
+          alert("Solflare connected: " + wallet);
+          verifyPayment(wallet);
+        } catch (err) {
+          alert("Solflare connection failed.");
+        }
+      } else {
+        alert("Please install Solflare wallet.");
+      }
+    });
+
+    // Countdown Logic
+    const lastPaymentDate = new Date("2025-07-01T12:00:00Z"); // Replace with 
+dynamic date from backend
+    const expiryTime = new Date(lastPaymentDate.getTime() + 30 * 24 * 60 * 60 * 
+1000);
+
+    function updateCountdown() {
+      const now = new Date();
+      const diff = expiryTime - now;
+      const countdownEl = document.getElementById("countdown");
+
+      if (diff <= 0) {
+        countdownEl.innerText = "⛔ Access expired. Please pay again.";
+        countdownEl.style.color = "red";
+        return;
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
+
+      countdownEl.innerText =
+        `✅ Access valid for: ${days}d ${hours}h ${minutes}m ${seconds}s`;
+    }
+
+    setInterval(updateCountdown, 1000);
+    updateCountdown();
+  </script>
+</body>
+</html>
+

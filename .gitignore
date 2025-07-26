@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Logs
 logs
 *.log
@@ -7,7 +8,7 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+node_modules/
 dist
 dist-ssr
 *.local
@@ -23,4 +24,7 @@ dist-ssr
 *.sln
 *.sw?
 venv/
+=======
+.env
+>>>>>>> 134ca3c879512b3c98b69d9674e39fc6787db81a
 
